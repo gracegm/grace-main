@@ -13,6 +13,14 @@ export async function generateMetadata({
     (category) => category.slug === params.categoryId
   );
 
+  if (!category) {
+    return getSEOTags({
+      title: "Category Not Found",
+      description: "The requested category could not be found.",
+      canonicalUrlRelative: `/blog/category/${params.categoryId}`,
+    });
+  }
+
   return getSEOTags({
     title: `${category.title} | Blog by ${config.appName}`,
     description: category.description,
@@ -28,6 +36,16 @@ export default async function Category({
   const category = categories.find(
     (category) => category.slug === params.categoryId
   );
+  
+  if (!category) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-4xl font-bold text-center mb-4">Category Not Found</h1>
+        <p className="text-center text-gray-600">The requested category could not be found.</p>
+      </div>
+    );
+  }
+  
   const articlesInCategory = articles
     .filter((article) =>
       article.categories.map((c) => c.slug).includes(category.slug)
