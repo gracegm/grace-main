@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     const previousAnalysis = await db.getLatestSkinAnalysis(userId);
 
     // Generate new AI analysis
-    const newAnalysis = await aiService.generateSkinAnalysis(user, previousAnalysis);
+    const newAnalysis = await aiService.generateSkinAnalysis(user, previousAnalysis || undefined);
 
     // Save analysis
     await db.addSkinAnalysis(newAnalysis);
