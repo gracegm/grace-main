@@ -24,7 +24,9 @@ const ButtonLead = ({ extraStyle }: { extraStyle?: string }) => {
       toast.success("Thanks for joining the waitlist!");
 
       // just remove the focus on the input
-      inputRef.current.blur();
+      if (inputRef.current) {
+        inputRef.current.blur();
+      }
       setEmail("");
       setIsDisabled(true);
     } catch (error) {
