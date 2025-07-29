@@ -1,50 +1,55 @@
-# FeNAgO — Next.js Agentic SaaS Boilerplate
+# PeachieGlow - AI-Powered Skincare SaaS Landing Page
 
-![FeNAgO Logo](./app/icon.png)
+> **Transform skincare routines into addictive, gamified experiences with AI-powered insights**
 
-FeNAgO is a complete platform for building agentic AI-powered SaaS products. This template allows you to create Agentic SaaS applications without wasting time on the plumbing and infrastructure so you can build products in days and not months.
+PeachieGlow is a revolutionary B2C SaaS landing page that combines cutting-edge AI technology with gamification to make skincare as engaging as social media. Built with Next.js 15, TypeScript, and Framer Motion.
 
-FeNAgO empowers students, developers, startups, and entrepreneurs to build fully agentic SaaS solutions at lightning speed by handling security (logins & registration), database setup, SEO, and monetization right out of the box—powered by Next.js, Tailwind, and React. All you bring is your idea!
+![PeachieGlow Demo](https://via.placeholder.com/800x400/FFB5A7/FFFFFF?text=PeachieGlow+Demo)
 
-<sub>**Watch/Star the repo to be notified when updates are pushed**</sub>
+## Key Features
 
-## Getting Started
+### AI-Powered Core
+- **GlowBot Assistant**: Context-aware AI conversations for personalized skincare advice
+- **SkinForecast Engine**: Predictive skin analysis with confidence scores
+- **Smart Recommendations**: AI-curated product and routine suggestions
+- **Intelligent Achievement System**: Dynamic progress tracking with motivational insights
 
-Follow these steps to get FeNAgO up and running on your machine:
+### Gamification Elements
+- **GlowScore Tracking**: Habit-forming progress system with streaks and levels
+- **Achievement Badges**: Rarity-based reward system (Common → Legendary)
+- **Daily Challenges**: Interactive habit tracking with XP rewards
+- **Social Proof**: Live user activity and success stories
 
-1. Create a new folder and open WindSurf and the folder  
-2. Clone the repository:
-   ```bash
-   git clone https://github.com/fenago/fenago21.git
-   ```
-3. Install dependencies:
-   ```bash
-   npm install
-   ```
-4. Remove the original remote (if you want to push to your own repository):
-   ```bash
-   git remote remove origin
-   ```
-5. Start the development server:
-   ```bash
-   npm run dev
-   ```
+### Modern UI/UX
+- **Peachy-Pink Gradient Design**: Warm, inviting color palette
+- **AI-Accent Teal**: Distinctive #00D4AA for AI features
+- **Smooth Animations**: Framer Motion throughout for engaging interactions
+- **Responsive Design**: Mobile-first approach with perfect cross-device experience
 
-That will get you running!
+## Quick Start
 
-6. Environment setup:
-   - Rename `.env.sample` to `.env`
-   - Add your API keys and other credentials to the `.env` file
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+- Git
 
-## Documentation
+### Installation
 
-FeNAgO comes with comprehensive documentation to help you get started quickly:
+```bash
+# Clone the repository
+git clone https://github.com/gracegm/grace-main.git
+cd grace-main
 
-### [DevDocs](./DevDocs)
+# Install dependencies
+npm install
 
-Implementation guides for setting up core functionality:
+# Set up environment variables
+cp .env.example .env.local
+# Edit .env.local with your configuration
 
-- [Setting Up Email With Resend](./DevDocs/1_Setting_Up_Email_With_Resend.md)
+# Start development server
+npm run dev
+```
 - [Setting Up MongoDB Atlas](./DevDocs/2_Setting_Up_MongoDB_Atlas.md)
 - [Setting Up Google Authentication](./DevDocs/3_Setting_Up_Google_Authentication.md)
 - [Setting Up Magic Links Authentication](./DevDocs/4_Setting_Up_Magic_Links_Authentication.md)

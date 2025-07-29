@@ -1,0 +1,16 @@
+{
+  "timestamp": "2025-07-29T18:21:03.699Z",
+  "project": "PeachieGlow B2C SaaS Landing Page",
+  "version": "0.1.0",
+  "status": "FAILED",
+  "errors": [
+    "Dependency installation failed: Command failed: npm ci",
+    "Deployment failed at: Install dependencies"
+  ],
+  "warnings": [],
+  "summary": {
+    "totalErrors": 2,
+    "totalWarnings": 0,
+    "deploymentReady": false
+  }
+}
