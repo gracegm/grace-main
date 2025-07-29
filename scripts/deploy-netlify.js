@@ -57,7 +57,7 @@ async function deployToNetlify() {
 
     // Step 2: Install dependencies
     log('\n--- INSTALL DEPENDENCIES ---');
-    runCommand('npm ci', 'Installing dependencies');
+    runCommand('npm install', 'Installing dependencies');
     deploymentReport.steps.push('Dependencies installation: PASSED');
 
     // Step 3: Type checking

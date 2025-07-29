@@ -1,0 +1,16 @@
+{
+  "timestamp": "2025-07-29T19:05:01.498Z",
+  "status": "FAILED",
+  "steps": [
+    "Pre-deployment checks: PASSED",
+    "Dependencies installation: PASSED"
+  ],
+  "errors": [
+    "Command failed: npm run build\n ⚠ For production Image Optimization with Next.js, the optional 'sharp' package is strongly recommended. Run 'npm i sharp', and Next.js will use it automatically for Image Optimization.\nRead more: https://nextjs.org/docs/messages/sharp-missing-in-production\n ⚠ Compiled with warnings\n\n./lib/performance.ts\nCritical dependency: the request of a dependency is an expression\n\nImport trace for requested module:\n./lib/performance.ts\n./app/testing/page.tsx\n\n./lib/performance.ts\nCritical dependency: the request of a dependency is an expression\n\nImport trace for requested module:\n./lib/performance.ts\n./app/testing/page.tsx\n\nFailed to compile.\n\n./app/api/glowbot/chat/route.ts:44:11\nType error: Type 'SkinAnalysis | null' is not assignable to type 'SkinAnalysis | undefined'.\n  Type 'null' is not assignable to type 'SkinAnalysis | undefined'.\n\n\u001b[0m \u001b[90m 42 |\u001b[39m         context\u001b[33m:\u001b[39m {\u001b[0m\n\u001b[0m \u001b[90m 43 |\u001b[39m           skinType\u001b[33m:\u001b[39m user\u001b[33m.\u001b[39mskinType\u001b[33m,\u001b[39m\u001b[0m\n\u001b[0m\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 44 |\u001b[39m           recentAnalysis\u001b[33m,\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m    |\u001b[39m           \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 45 |\u001b[39m           currentHabits\u001b[33m,\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 46 |\u001b[39m           userConcerns\u001b[33m:\u001b[39m user\u001b[33m.\u001b[39mskinConcerns\u001b[0m\n\u001b[0m \u001b[90m 47 |\u001b[39m         }\u001b[33m,\u001b[39m\u001b[0m\nNext.js build worker exited with code: 1 and signal: null\n"
+  ],
+  "warnings": [
+    "Type checking failed - continuing deployment",
+    "Linting failed - continuing deployment"
+  ],
+  "deploymentUrl": null
+}

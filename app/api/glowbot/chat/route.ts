@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
         messages: [],
         context: {
           skinType: user.skinType,
-          recentAnalysis,
+          recentAnalysis: recentAnalysis || undefined,
           currentHabits,
           userConcerns: user.skinConcerns
         },
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
     // Generate AI response
     const aiResponse = await aiService.generateGlowBotResponse(message, {
       user,
-      recentAnalysis,
+      recentAnalysis: recentAnalysis || undefined,
       currentHabits,
       conversationHistory: conversation.messages
     });
