@@ -6,7 +6,7 @@ import configFile from "@/config";
 import User from "@/models/User";
 import { findCheckoutSession } from "@/libs/stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: "2023-08-16",
   typescript: true,
 });
@@ -22,6 +22,11 @@ export async function POST(req: NextRequest) {
   const body = await req.text();
 
   const signature = headers().get("stripe-signature");
+
+  if (!signature) {
+    console.error('Missing stripe-signature header');
+    return NextResponse.json({ error: 'Missing stripe-signature header' }, { status: 400 });
+  }
 
   let eventType;
   let event;
