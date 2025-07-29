@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
         const session = await findCheckoutSession(stripeObject.id);
 
         const customerId = session?.customer;
-        const priceId = session?.line_items?.data[0]?.price.id;
+        const priceId = session?.line_items?.data?.[0]?.price?.id;
         const userId = stripeObject.client_reference_id;
         const plan = configFile.stripe.plans.find((p) => p.priceId === priceId);
 
@@ -142,7 +142,7 @@ export async function POST(req: NextRequest) {
         const stripeObject: Stripe.Invoice = event.data
           .object as Stripe.Invoice;
 
-        const priceId = stripeObject.lines.data[0].price.id;
+        const priceId = stripeObject.lines.data?.[0]?.price?.id;
         const customerId = stripeObject.customer;
 
         const user = await User.findOne({ customerId });
