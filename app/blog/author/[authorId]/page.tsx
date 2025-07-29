@@ -75,9 +75,9 @@ export default async function Author({
             className="rounded-box w-[12rem] md:w-[16rem] "
           />
 
-          {author.socials?.length > 0 && (
+          {(author.socials && author.socials.length > 0) && (
             <div className="flex flex-col md:flex-row gap-4">
-              {author.socials.map((social) => (
+              {author.socials!.map((social) => (
                 <a
                   key={social.name}
                   href={social.url}
