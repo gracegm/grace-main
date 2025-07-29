@@ -28,6 +28,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing stripe-signature header' }, { status: 400 });
   }
 
+  if (!webhookSecret) {
+    console.error('Missing STRIPE_WEBHOOK_SECRET environment variable');
+    return NextResponse.json({ error: 'Webhook configuration error' }, { status: 500 });
+  }
+
   let eventType;
   let event;
 
