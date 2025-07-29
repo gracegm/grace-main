@@ -7,9 +7,14 @@ echo.
 REM Add all changes
 echo Adding all changes...
 git add .
+if %errorlevel% neq 0 (
+    echo Error: Failed to add changes.
+    pause
+    exit /b 1
+)
 
 REM Check if there are changes to commit
-git diff --cached --quiet
+git diff --cached --exit-code >nul 2>&1
 if %errorlevel% equ 0 (
     echo No changes to commit.
     pause
@@ -36,10 +41,16 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Push to origin main
+REM Push to origin master (or main)
 echo.
-echo Pushing to origin main...
-git push origin main
+echo Pushing to origin master...
+git push origin master
+
+REM If master fails, try main
+if %errorlevel% neq 0 (
+    echo Trying to push to main branch...
+    git push origin main
+)
 
 REM Check if push was successful
 if %errorlevel% equ 0 (
@@ -51,6 +62,7 @@ if %errorlevel% equ 0 (
     echo.
     echo ========================================
     echo    Error: Failed to push to repository
+    echo    Make sure you have push permissions
     echo ========================================
 )
 
