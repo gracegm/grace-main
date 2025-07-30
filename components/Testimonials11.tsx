@@ -183,8 +183,8 @@ const Testimonial = ({ i }: { i: number }) => {
             {testimonial.img ? (
               <Image
                 className="w-10 h-10 rounded-full object-cover"
-                src={list[i].img}
-                alt={`${list[i].name}'s testimonial for ${config.appName}`}
+                src={testimonial.img}
+                alt={`${testimonial.name}'s testimonial for ${config.appName}`}
                 width={48}
                 height={48}
               />
@@ -225,7 +225,7 @@ const Testimonial = ({ i }: { i: number }) => {
 
 // A video tesionial to build trust. 2 or 3 on a wall of love is perfect.
 const VideoTestimonial = ({ i }: { i: number }) => {
-  const vidRef = useRef(null);
+  const vidRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -236,6 +236,8 @@ const VideoTestimonial = ({ i }: { i: number }) => {
   }, [vidRef?.current?.readyState]);
 
   const handlePlayVideo = () => {
+    if (!vidRef.current) return;
+    
     if (isPlaying) {
       vidRef.current.pause();
       setIsPlaying(false);
@@ -243,7 +245,7 @@ const VideoTestimonial = ({ i }: { i: number }) => {
       vidRef.current.play();
       setIsPlaying(true);
 
-      if (vidRef.current?.readyState === 0) setIsLoading(true);
+      if (vidRef.current.readyState === 0) setIsLoading(true);
     }
   };
 
@@ -402,7 +404,7 @@ const Testimonials11 = () => {
                       {list[list.length - 1].img ? (
                         <Image
                           className="w-12 h-12 rounded-full object-cover"
-                          src={list[list.length - 1].img}
+                          src={list[list.length - 1].img!}
                           alt={`${
                             list[list.length - 1].name
                           }'s testimonial for ${config.appName}`}
