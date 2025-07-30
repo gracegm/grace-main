@@ -189,11 +189,11 @@ const Media = ({ feature }: { feature: Feature }) => {
         <source src={path} type={format} />
       </video>
     );
-  } else if (type === "image") {
+  } else if (type === "image" && path) {
     return (
       <Image
         src={path}
-        alt={alt}
+        alt={alt || "Feature image"}
         className={`${style} object-cover object-center`}
         width={size.width}
         height={size.height}
