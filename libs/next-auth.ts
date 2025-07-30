@@ -7,7 +7,7 @@ import config from "@/config";
 import connectMongo from "./mongo";
 
 interface NextAuthOptionsExtended extends NextAuthOptions {
-  adapter: any;
+  adapter?: any;
 }
 
 export const authOptions: NextAuthOptionsExtended = {
@@ -16,8 +16,8 @@ export const authOptions: NextAuthOptionsExtended = {
   providers: [
     GoogleProvider({
       // Follow the "Login with Google" tutorial to get your credentials
-      clientId: process.env.GOOGLE_ID,
-      clientSecret: process.env.GOOGLE_SECRET,
+      clientId: process.env.GOOGLE_ID || "",
+      clientSecret: process.env.GOOGLE_SECRET || "",
       async profile(profile) {
         return {
           id: profile.sub,
@@ -53,7 +53,7 @@ export const authOptions: NextAuthOptionsExtended = {
 
   callbacks: {
     session: async ({ session, token }) => {
-      if (session?.user) {
+      if (session?.user && token.sub) {
         session.user.id = token.sub;
       }
       return session;
