@@ -393,42 +393,47 @@ const Testimonials11 = () => {
             {/* BIG FEATURED TESTIMONIAL — THE LAST ONE IN THE LIST (11th) */}
             <ul className="col-span-2">
               <li>
-                <figure className="relative h-full p-6 bg-base-100 rounded-lg">
-                  <blockquote className="relative p-4">
-                    <p className="text-lg font-medium text-base-content">
-                      {list[list.length - 1].text}
-                    </p>
-                  </blockquote>
-                  <figcaption className="relative flex items-center justify-start gap-4 pt-4 mt-4 border-t border-base-content/5">
-                    <div className="overflow-hidden rounded-full bg-base-300 shrink-0">
-                      {list[list.length - 1].img ? (
-                        <Image
-                          className="w-12 h-12 rounded-full object-cover"
-                          src={list[list.length - 1].img!}
-                          alt={`${
-                            list[list.length - 1].name
-                          }'s testimonial for ${config.appName}`}
-                          width={48}
-                          height={48}
-                        />
-                      ) : (
-                        <span className="w-12 h-12 rounded-full flex justify-center items-center text-xl font-medium bg-base-300">
-                          {list[list.length - 1].name.charAt(0)}
-                        </span>
-                      )}
-                    </div>
-                    <div>
-                      <div className="text-base font-medium text-base-content">
-                        {list[list.length - 1].name}
-                      </div>
-                      {list[list.length - 1].username && (
-                        <div className="mt-1 text-base text-base-content/80">
-                          @{list[list.length - 1].username}
+                {(() => {
+                  const featuredTestimonial = list[list.length - 1];
+                  if (!featuredTestimonial) return null;
+                  
+                  return (
+                    <figure className="relative h-full p-6 bg-base-100 rounded-lg">
+                      <blockquote className="relative p-4">
+                        <p className="text-lg font-medium text-base-content">
+                          {featuredTestimonial.text}
+                        </p>
+                      </blockquote>
+                      <figcaption className="relative flex items-center justify-start gap-4 pt-4 mt-4 border-t border-base-content/5">
+                        <div className="overflow-hidden rounded-full bg-base-300 shrink-0">
+                          {featuredTestimonial.img ? (
+                            <Image
+                              className="w-12 h-12 rounded-full object-cover"
+                              src={featuredTestimonial.img}
+                              alt={`${featuredTestimonial.name}'s testimonial for ${config.appName}`}
+                              width={48}
+                              height={48}
+                            />
+                          ) : (
+                            <span className="w-12 h-12 rounded-full flex justify-center items-center text-xl font-medium bg-base-300">
+                              {featuredTestimonial.name.charAt(0)}
+                            </span>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  </figcaption>
-                </figure>
+                        <div>
+                          <div className="text-base font-medium text-base-content">
+                            {featuredTestimonial.name}
+                          </div>
+                          {featuredTestimonial.username && (
+                            <div className="mt-1 text-base text-base-content/80">
+                              @{featuredTestimonial.username}
+                            </div>
+                          )}
+                        </div>
+                      </figcaption>
+                    </figure>
+                  );
+                })()}
               </li>
             </ul>
             <ul role="list" className="flex flex-col gap-y-6 sm:gap-y-8">
