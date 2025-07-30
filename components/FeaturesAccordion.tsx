@@ -124,7 +124,7 @@ const Item = ({
   isOpen: boolean;
   setFeatureSelected: () => void;
 }) => {
-  const accordion = useRef(null);
+  const accordion = useRef<HTMLDivElement>(null);
   const { title, description, svg } = feature;
 
   return (
