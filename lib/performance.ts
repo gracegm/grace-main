@@ -169,9 +169,9 @@ export const BundleAnalyzer = {
 
 // Memory leak detector
 export const MemoryLeakDetector = {
-  private listeners: Map<string, EventListener[]> = new Map(),
-  private timers: Set<number> = new Set(),
-  private intervals: Set<number> = new Set(),
+  listeners: new Map<string, EventListener[]>(),
+  timers: new Set<number>(),
+  intervals: new Set<number>(),
 
   // Track event listeners
   trackEventListener(element: string, event: string, listener: EventListener): void {
@@ -193,8 +193,8 @@ export const MemoryLeakDetector = {
   // Cleanup all tracked resources
   cleanup(): void {
     // Clear timers
-    this.timers.forEach(id => clearTimeout(id));
-    this.intervals.forEach(id => clearInterval(id));
+    this.timers.forEach((id: number) => clearTimeout(id));
+    this.intervals.forEach((id: number) => clearInterval(id));
     
     // Clear listeners (would need actual DOM elements to remove)
     console.log(`Cleanup: ${this.listeners.size} listener types, ${this.timers.size} timers, ${this.intervals.size} intervals`);
