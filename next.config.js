@@ -25,8 +25,6 @@ const nextConfig = {
   experimental: {
     optimizeCss: true,
     optimizePackageImports: ['framer-motion', 'lucide-react'],
-    // Skip error pages during static generation
-    skipTrailingSlashRedirect: true,
   },
   
   // Headers for security and performance
@@ -83,13 +81,6 @@ const nextConfig = {
   
   // Build output optimization
   output: 'standalone',
-  
-  // Exclude error pages from static generation
-  exportPathMap: async function (defaultPathMap) {
-    const pathMap = { ...defaultPathMap };
-    delete pathMap['/_error'];
-    return pathMap;
-  },
   
   // Webpack optimizations
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
