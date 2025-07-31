@@ -1,5 +1,3 @@
-"use client";
-
 import { motion } from 'framer-motion';
 import PeachieGlowHeader from '@/components/PeachieGlowHeader';
 import PeachieGlowHero from '@/components/PeachieGlowHero';
