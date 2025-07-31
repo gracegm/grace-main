@@ -22,12 +22,19 @@ const PeachieGlowHeader = ({ className = "" }: PeachieGlowHeaderProps) => {
   }, []);
 
   const navItems = [
-    { label: 'Features', href: '#features' },
-    { label: 'GlowScore', href: '#glowscore' },
-    { label: 'Achievements', href: '#achievements' },
-    { label: 'Testimonials', href: '#testimonials' },
-    { label: 'Pricing', href: '#pricing' }
+    { label: 'Features', href: '#features', action: () => scrollToSection('features') },
+    { label: 'GlowScore', href: '#glowscore', action: () => scrollToSection('glowscore') },
+    { label: 'Achievements', href: '#achievements', action: () => scrollToSection('achievements') },
+    { label: 'Demo', href: '/demo', action: () => window.location.href = '/demo' },
+    { label: 'Testing', href: '/testing', action: () => window.location.href = '/testing' }
   ];
+
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <motion.header
@@ -67,10 +74,10 @@ const PeachieGlowHeader = ({ className = "" }: PeachieGlowHeaderProps) => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             {navItems.map((item, index) => (
-              <motion.a
+              <motion.button
                 key={item.label}
-                href={item.href}
-                className={`font-medium transition-colors duration-200 hover:text-[#00D4AA] ${
+                onClick={item.action}
+                className={`font-medium transition-colors duration-200 hover:text-[#00D4AA] cursor-pointer ${
                   isScrolled ? 'text-gray-700' : 'text-white/90'
                 }`}
                 initial={{ opacity: 0, y: -20 }}
@@ -79,13 +86,14 @@ const PeachieGlowHeader = ({ className = "" }: PeachieGlowHeaderProps) => {
                 whileHover={{ scale: 1.05 }}
               >
                 {item.label}
-              </motion.a>
+              </motion.button>
             ))}
           </nav>
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center space-x-4">
             <motion.button
+              onClick={() => alert('Sign In functionality coming soon! 🚀')}
               className={`font-medium transition-colors duration-200 ${
                 isScrolled 
                   ? 'text-gray-700 hover:text-[#00D4AA]' 
@@ -100,6 +108,7 @@ const PeachieGlowHeader = ({ className = "" }: PeachieGlowHeaderProps) => {
             </motion.button>
             
             <motion.button
+              onClick={() => alert('Free Trial coming soon! Your PeachieGlow journey awaits! ✨')}
               className="bg-gradient-to-r from-[#00D4AA] to-[#4CAF50] text-white font-semibold px-6 py-2 rounded-full hover:shadow-lg transition-all duration-300 transform hover:scale-105"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -149,19 +158,21 @@ const PeachieGlowHeader = ({ className = "" }: PeachieGlowHeaderProps) => {
                 {/* Mobile Navigation Links */}
                 <nav className="space-y-3 mb-4">
                   {navItems.map((item, index) => (
-                    <motion.a
+                    <motion.button
                       key={item.label}
-                      href={item.href}
-                      className={`block font-medium transition-colors duration-200 hover:text-[#00D4AA] ${
+                      onClick={() => {
+                        item.action();
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className={`block w-full text-left font-medium transition-colors duration-200 hover:text-[#00D4AA] ${
                         isScrolled ? 'text-gray-700' : 'text-white/90'
                       }`}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
-                      onClick={() => setIsMobileMenuOpen(false)}
                     >
                       {item.label}
-                    </motion.a>
+                    </motion.button>
                   ))}
                 </nav>
 
