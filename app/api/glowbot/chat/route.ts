@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
 
     // Get additional context
     const recentAnalysis = await db.getLatestSkinAnalysis(userId);
-    const currentHabits = await db.getHabitEntries(userId, new Date());
+    const currentHabits = await db.getHabitEntries(userId);
     const conversations = await db.getConversations(userId);
     
     let conversation: GlowBotConversation;
