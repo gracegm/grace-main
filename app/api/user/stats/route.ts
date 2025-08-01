@@ -94,11 +94,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Update user profile
-    const updatedUser = await db.updateUser(userId, {
+    await db.updateUser(userId, {
       ...updates,
       lastActive: new Date()
     });
 
+    // Get updated user data
+    const updatedUser = await db.getUser(userId);
     if (!updatedUser) {
       return NextResponse.json(
         { error: 'User not found' },
