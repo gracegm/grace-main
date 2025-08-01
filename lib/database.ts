@@ -592,6 +592,11 @@ class DatabaseService {
     return fallbackDb.activities.get(userId) || [];
   }
 
+  async getUserActivities(userId: string, limit = 10): Promise<UserActivity[]> {
+    const activities = await this.getActivities(userId);
+    return activities.slice(-limit).reverse(); // Get latest activities
+  }
+
   async addActivity(activity: UserActivity): Promise<void> {
     return await fallbackDb.addActivity(activity);
   }
