@@ -637,5 +637,41 @@ export async function checkAchievements(userId: string): Promise<UserAchievement
 
   return newAchievements;
 }
-/ /   F o r c e   r e b u i l d  
- 
+
+export async function checkAchievements(userId: string): Promise<UserAchievement[]> {
+  const user = await db.getUser(userId);
+  const userAchievements = await db.getUserAchievements(userId);
+  const allAchievements = await db.getAchievements();
+  
+  if (!user) return [];
+
+  const newAchievements: UserAchievement[] = [];
+  const unlockedIds = userAchievements.filter(ua => ua.isUnlocked).map(ua => ua.achievementId);
+
+  for (const achievement of allAchievements) {
+    if (unlockedIds.includes(achievement.id)) continue;
+
+    let shouldUnlock = false;
+
+    switch (achievement.requirements.type) {
+      case 'streak':
+        shouldUnlock = user.currentStreak >= achievement.requirements.value;
+        break;
+      case 'days':
+        shouldUnlock = user.totalDaysActive >= achievement.requirements.value;
+        break;
+      case 'score':
+        shouldUnlock = user.glowScore >= achievement.requirements.value;
+        break;
+    }
+
+    if (shouldUnlock) {
+      const newAchievement = await db.unlockAchievement(userId, achievement.id);
+      if (newAchievement) {
+        newAchievements.push(newAchievement);
+      }
+    }
+  }
+
+  return newAchievements;
+}
