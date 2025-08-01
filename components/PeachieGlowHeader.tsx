@@ -93,7 +93,10 @@ const PeachieGlowHeader = ({ className = "" }: PeachieGlowHeaderProps) => {
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center space-x-4">
             <motion.button
-              onClick={() => alert('Sign In functionality coming soon! 🚀')}
+              onClick={() => {
+                console.log('Sign In clicked');
+                window.open('mailto:contact@peachyglow.com?subject=Early Access Request&body=Hi! I\'d like early access to PeachieGlow. Please let me know when Sign In is available!', '_blank');
+              }}
               className={`font-medium transition-colors duration-200 ${
                 isScrolled 
                   ? 'text-gray-700 hover:text-[#00D4AA]' 
@@ -108,7 +111,10 @@ const PeachieGlowHeader = ({ className = "" }: PeachieGlowHeaderProps) => {
             </motion.button>
             
             <motion.button
-              onClick={() => alert('Free Trial coming soon! Your PeachieGlow journey awaits! ✨')}
+              onClick={() => {
+                console.log('Start Free Trial clicked');
+                window.open('mailto:contact@peachyglow.com?subject=Free Trial Request&body=Hi! I\'m interested in starting a free trial of PeachieGlow. Please notify me when it\'s available!', '_blank');
+              }}
               className="bg-gradient-to-r from-[#00D4AA] to-[#4CAF50] text-white font-semibold px-6 py-2 rounded-full hover:shadow-lg transition-all duration-300 transform hover:scale-105"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
