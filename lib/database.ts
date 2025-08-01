@@ -489,6 +489,14 @@ class DatabaseService {
     return await mongoDb.createSkinAnalysis(analysis);
   }
 
+  async getLatestSkinAnalysis(userId: string): Promise<SkinAnalysis | null> {
+    const analyses = await this.getSkinAnalyses(userId);
+    if (analyses.length === 0) return null;
+    
+    // Return the most recent analysis (sorted by date)
+    return analyses.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+  }
+
   async getHabitEntries(userId: string): Promise<HabitEntry[]> {
     return await mongoDb.getHabitEntries(userId);
   }
