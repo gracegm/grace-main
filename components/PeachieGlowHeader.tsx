@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSession, signIn, signOut } from 'next-auth/react';
 import GlowBot from './GlowBot';
 
 interface PeachieGlowHeaderProps {
@@ -9,6 +10,7 @@ interface PeachieGlowHeaderProps {
 }
 
 const PeachieGlowHeader = ({ className = "" }: PeachieGlowHeaderProps) => {
+  const { data: session, status } = useSession();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -92,28 +94,54 @@ const PeachieGlowHeader = ({ className = "" }: PeachieGlowHeaderProps) => {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <motion.button
-              onClick={() => {
-                console.log('Sign In clicked');
-                window.open('mailto:contact@peachyglow.com?subject=Early Access Request&body=Hi! I\'d like early access to PeachieGlow. Please let me know when Sign In is available!', '_blank');
-              }}
-              className={`font-medium transition-colors duration-200 ${
-                isScrolled 
-                  ? 'text-gray-700 hover:text-[#00D4AA]' 
-                  : 'text-white/90 hover:text-white'
-              }`}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.8 }}
-              whileHover={{ scale: 1.05 }}
-            >
-              Sign In
-            </motion.button>
+            {session ? (
+              <div className="flex items-center space-x-4">
+                <span className={`text-sm ${
+                  isScrolled ? 'text-gray-600' : 'text-white/80'
+                }`}>
+                  Hi, {session.user?.name?.split(' ')[0] || 'User'}!
+                </span>
+                <motion.button
+                  onClick={() => signOut()}
+                  className={`font-medium transition-colors duration-200 ${
+                    isScrolled 
+                      ? 'text-gray-700 hover:text-[#00D4AA]' 
+                      : 'text-white/90 hover:text-white'
+                  }`}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.8 }}
+                  whileHover={{ scale: 1.05 }}
+                >
+                  Sign Out
+                </motion.button>
+              </div>
+            ) : (
+              <motion.button
+                onClick={() => signIn()}
+                className={`font-medium transition-colors duration-200 ${
+                  isScrolled 
+                    ? 'text-gray-700 hover:text-[#00D4AA]' 
+                    : 'text-white/90 hover:text-white'
+                }`}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.8 }}
+                whileHover={{ scale: 1.05 }}
+              >
+                Sign In
+              </motion.button>
+            )}
             
             <motion.button
               onClick={() => {
-                console.log('Start Free Trial clicked');
-                window.open('mailto:contact@peachyglow.com?subject=Free Trial Request&body=Hi! I\'m interested in starting a free trial of PeachieGlow. Please notify me when it\'s available!', '_blank');
+                if (session) {
+                  // User is signed in, redirect to dashboard
+                  window.location.href = '/dashboard';
+                } else {
+                  // User not signed in, sign in first
+                  signIn();
+                }
               }}
               className="bg-gradient-to-r from-[#00D4AA] to-[#4CAF50] text-white font-semibold px-6 py-2 rounded-full hover:shadow-lg transition-all duration-300 transform hover:scale-105"
               initial={{ opacity: 0, x: 20 }}
@@ -122,7 +150,7 @@ const PeachieGlowHeader = ({ className = "" }: PeachieGlowHeaderProps) => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              Start Free Trial
+              {session ? 'Go to Dashboard' : 'Start Free Trial'}
             </motion.button>
           </div>
 

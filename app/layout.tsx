@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { Viewport } from "next";
 import { getSEOTags } from "@/libs/seo";
 import ClientLayout from "@/components/LayoutClient";
+import SessionProvider from "@/components/SessionProvider";
 import config from "@/config";
 import "./globals.css";
 
@@ -27,8 +28,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 			className={font.className}
 		>
 			<body>
-				{/* ClientLayout contains all the client wrappers (Crisp chat support, toast messages, tooltips, etc.) */}
-				<ClientLayout>{children}</ClientLayout>
+				{/* SessionProvider enables NextAuth throughout the app */}
+				<SessionProvider>
+					{/* ClientLayout contains all the client wrappers (Crisp chat support, toast messages, tooltips, etc.) */}
+					<ClientLayout>{children}</ClientLayout>
+				</SessionProvider>
 			</body>
 		</html>
 	);
