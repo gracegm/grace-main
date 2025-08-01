@@ -569,6 +569,17 @@ class DatabaseService {
     return await fallbackDb.addConversation(conversation);
   }
 
+  async updateConversation(conversationId: string, conversation: GlowBotConversation): Promise<void> {
+    // Update conversation in fallback storage
+    const conversations = fallbackDb.conversations.get(conversation.userId) || [];
+    const index = conversations.findIndex(c => c.id === conversationId);
+    
+    if (index !== -1) {
+      conversations[index] = { ...conversation, updatedAt: new Date() };
+      fallbackDb.conversations.set(conversation.userId, conversations);
+    }
+  }
+
   async getActivities(userId: string): Promise<UserActivity[]> {
     return fallbackDb.activities.get(userId) || [];
   }
