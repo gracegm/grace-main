@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
 
     // Check if habit already exists for today
     const today = new Date();
-    const existingHabits = await db.getHabitEntries(userId, today);
+    const existingHabits = await db.getHabitEntries(userId);
     const existingHabit = existingHabits.find(h => h.taskId === taskId);
 
     if (existingHabit) {
@@ -155,7 +155,7 @@ export async function GET(request: NextRequest) {
     }
 
     const targetDate = date ? new Date(date) : new Date();
-    const habits = await db.getHabitEntries(userId, targetDate);
+    const habits = await db.getHabitEntries(userId);
 
     // Get user for additional context
     const user = await db.getUser(userId);
