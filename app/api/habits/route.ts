@@ -29,52 +29,50 @@ export async function POST(request: NextRequest) {
 
     if (existingHabit) {
       // Update existing habit
-      const updatedHabit = await db.updateHabitEntry(existingHabit.id, {
+      await db.updateHabitEntry(existingHabit.id, {
         completed,
         completedAt: completed ? new Date() : undefined,
         streak: completed ? existingHabit.streak + 1 : Math.max(0, existingHabit.streak - 1)
       });
 
-      if (updatedHabit) {
-        // Update user stats
-        const newGlowScore = await calculateGlowScore(userId);
-        const newStreak = completed ? user.currentStreak + 1 : Math.max(0, user.currentStreak - 1);
-        
-        await db.updateUser(userId, {
-          glowScore: newGlowScore,
-          currentStreak: newStreak,
-          longestStreak: Math.max(user.longestStreak, newStreak),
-          totalDaysActive: completed ? user.totalDaysActive + 1 : user.totalDaysActive,
-          xp: user.xp + (completed ? 10 : 0),
-          lastActive: new Date()
-        });
+      // Update user stats
+      const newGlowScore = await calculateGlowScore(userId);
+      const newStreak = completed ? user.currentStreak + 1 : Math.max(0, user.currentStreak - 1);
+      
+      await db.updateUser(userId, {
+        glowScore: newGlowScore,
+        currentStreak: newStreak,
+        longestStreak: Math.max(user.longestStreak, newStreak),
+        totalDaysActive: completed ? user.totalDaysActive + 1 : user.totalDaysActive,
+        xp: user.xp + (completed ? 10 : 0),
+        lastActive: new Date()
+      });
 
-        // Check for achievements
-        const newAchievements = await checkAchievements(userId);
+      // Check for achievements
+      const newAchievements = await checkAchievements(userId);
 
-        // Add activity
-        if (completed) {
-          await db.addActivity({
-            id: `activity-${Date.now()}`,
-            userId,
-            type: 'habit_completed',
-            description: `Completed ${taskTitle}`,
-            timestamp: new Date(),
-            metadata: {
-              habitId: taskId,
-              streakDays: updatedHabit.streak
-            }
-          });
-        }
-
-        return NextResponse.json({
-          habit: updatedHabit,
-          newGlowScore,
-          newStreak,
-          newAchievements,
-          xpEarned: completed ? 10 : 0
+      // Add activity
+      if (completed) {
+        await db.addActivity({
+          id: `activity-${Date.now()}`,
+          userId,
+          type: 'habit_completed',
+          description: `Completed ${taskTitle}`,
+          timestamp: new Date(),
+          metadata: {
+            habitId: taskId,
+            streakDays: existingHabit.streak
+          }
         });
       }
+
+      return NextResponse.json({
+        habit: existingHabit,
+        newGlowScore,
+        newStreak,
+        newAchievements,
+        xpEarned: completed ? 10 : 0
+      });
     } else {
       // Create new habit entry
       const newHabit: HabitEntry = {
