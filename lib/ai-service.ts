@@ -3,7 +3,7 @@
 
 import { GlowBotMessage, SkinAnalysis, SkinForecast, User, HabitEntry } from '@/types/user';
 
-// Mock AI responses for demo (replace with real AI API in production)
+// Real OpenAI API Integration for Production
 export class AIService {
   private static instance: AIService;
 
@@ -14,7 +14,7 @@ export class AIService {
     return AIService.instance;
   }
 
-  // GlowBot AI Chat
+  // GlowBot AI Chat - Real OpenAI Integration
   async generateGlowBotResponse(
     userMessage: string,
     context: {
@@ -24,54 +24,106 @@ export class AIService {
       conversationHistory: GlowBotMessage[];
     }
   ): Promise<string> {
-    // Simulate AI processing delay
-    await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
-
-    const { user, recentAnalysis, currentHabits } = context;
-    const lowerMessage = userMessage.toLowerCase();
-
-    // Context-aware responses based on user data
-    if (lowerMessage.includes('routine') || lowerMessage.includes('schedule')) {
+    try {
+      const { user, recentAnalysis, currentHabits, conversationHistory } = context;
+      
+      // Build context for AI
       const completedToday = currentHabits.filter(h => 
         h.completed && h.date.toDateString() === new Date().toDateString()
       ).length;
       
-      return `Great question! Based on your ${user.skinType} skin type and current ${user.glowScore} GlowScore, I see you've completed ${completedToday} tasks today. For your ${user.skinConcerns.join(' and ')} concerns, I recommend focusing on consistency with your morning cleanser and vitamin C serum. Your ${user.currentStreak}-day streak is amazing! 🌟`;
-    }
+      const userContext = `
+User Profile:
+- Skin Type: ${user.skinType}
+- Skin Concerns: ${user.skinConcerns.join(', ')}
+- Current GlowScore: ${user.glowScore}/100
+- Level: ${user.level} (${user.xp} XP)
+- Current Streak: ${user.currentStreak} days
+- Habits Completed Today: ${completedToday}
+${recentAnalysis ? `\n- Latest Skin Analysis Score: ${recentAnalysis.overallScore}/100` : ''}`;
+      
+      const conversationContext = conversationHistory.length > 0 
+        ? `\nRecent Conversation:\n${conversationHistory.slice(-3).map(msg => `${msg.role}: ${msg.content}`).join('\n')}`
+        : '';
+      
+      const systemPrompt = `You are GlowBot, an AI skincare assistant for PeachieGlow. You're enthusiastic, knowledgeable, and supportive. 
 
-    if (lowerMessage.includes('skin') || lowerMessage.includes('analysis')) {
-      if (recentAnalysis) {
-        const topImprovement = recentAnalysis.improvements[0];
-        return `Looking at your latest skin analysis, your overall score is ${recentAnalysis.overallScore}/100! Your ${topImprovement?.category} has improved by ${topImprovement?.percentage}% - that's fantastic progress! The AI detected that your consistency with hydrating products is really paying off. Keep up the great work! ✨`;
+Personality:
+- Use emojis sparingly but effectively (✨🌟💪🔥)
+- Be encouraging and celebrate user progress
+- Provide specific, actionable skincare advice
+- Reference user's data to personalize responses
+- Keep responses concise but helpful (2-3 sentences max)
+
+Expertise:
+- Skincare routines and product recommendations
+- Ingredient knowledge (retinol, niacinamide, hyaluronic acid, etc.)
+- Skin type-specific advice
+- Habit formation and motivation
+- Progress tracking and goal setting${userContext}${conversationContext}`;
+      
+      // Call OpenAI API
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini', // Cost-effective model for production
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userMessage }
+          ],
+          max_tokens: 150,
+          temperature: 0.7,
+          presence_penalty: 0.1,
+          frequency_penalty: 0.1
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`OpenAI API error: ${response.status}`);
       }
-      return `I'd love to help analyze your skin! Based on your profile, your ${user.skinType} skin with ${user.skinConcerns.join(' and ')} concerns would benefit from a consistent routine. Your current GlowScore of ${user.glowScore} shows you're on the right track! 🎯`;
+      
+      const data = await response.json();
+      const aiResponse = data.choices[0]?.message?.content?.trim();
+      
+      if (!aiResponse) {
+        throw new Error('No response from OpenAI');
+      }
+      
+      return aiResponse;
+      
+    } catch (error) {
+      console.error('AI Service Error:', error);
+      
+      // Fallback to contextual mock response if API fails
+      return this.getFallbackResponse(userMessage, context);
     }
-
+  }
+  
+  // Fallback responses when OpenAI API is unavailable
+  private getFallbackResponse(
+    userMessage: string,
+    context: { user: User; recentAnalysis?: SkinAnalysis; currentHabits: HabitEntry[] }
+  ): string {
+    const { user, recentAnalysis, currentHabits } = context;
+    const lowerMessage = userMessage.toLowerCase();
+    
+    if (lowerMessage.includes('routine') || lowerMessage.includes('schedule')) {
+      const completedToday = currentHabits.filter(h => 
+        h.completed && h.date.toDateString() === new Date().toDateString()
+      ).length;
+      return `Great question! Based on your ${user.skinType} skin and ${user.glowScore} GlowScore, you've completed ${completedToday} tasks today. Your ${user.currentStreak}-day streak is amazing! 🌟`;
+    }
+    
     if (lowerMessage.includes('product') || lowerMessage.includes('recommend')) {
       const skinTypeAdvice = this.getSkinTypeRecommendations(user.skinType);
-      return `For your ${user.skinType} skin, I recommend: ${skinTypeAdvice}. Given your concerns about ${user.skinConcerns.join(' and ')}, consistency is key! Your ${user.currentStreak}-day streak proves you've got this! 💪`;
+      return `For your ${user.skinType} skin, I recommend: ${skinTypeAdvice}. Your ${user.currentStreak}-day streak proves you've got this! 💪`;
     }
-
-    if (lowerMessage.includes('streak') || lowerMessage.includes('motivation')) {
-      return `Your ${user.currentStreak}-day streak is incredible! 🔥 You're at level ${user.level} with ${user.xp} XP. Remember, even small consistent actions compound into amazing results. Your skin is already thanking you - keep glowing! ✨`;
-    }
-
-    if (lowerMessage.includes('concern') || lowerMessage.includes('problem')) {
-      const concernAdvice = user.skinConcerns.map(concern => 
-        this.getConcernAdvice(concern)
-      ).join(' ');
-      return `I understand your concerns about ${user.skinConcerns.join(' and ')}. ${concernAdvice} Your dedication with a ${user.currentStreak}-day streak is exactly what will help address these issues! 🌟`;
-    }
-
-    // Default encouraging responses
-    const defaultResponses = [
-      `Hi there! I'm so excited to help you on your skincare journey! With your ${user.skinType} skin and ${user.glowScore} GlowScore, you're doing amazing. What would you like to know about your routine? ✨`,
-      `Your ${user.currentStreak}-day streak is inspiring! 🔥 As your AI skincare companion, I'm here to help optimize your routine for your ${user.skinType} skin. What's on your mind?`,
-      `Level ${user.level} and ${user.xp} XP - you're crushing it! 💪 Your consistency with skincare is paying off. How can I help you glow even brighter today?`,
-      `I love seeing your progress! Your skin analysis shows real improvement, and your ${user.currentStreak}-day streak proves dedication works. What would you like to explore next? 🌟`
-    ];
-
-    return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+    
+    return `Hi there! I'm here to help with your skincare journey. Your ${user.skinType} skin and ${user.glowScore} GlowScore show great progress! What would you like to know? ✨`;
   }
 
   private getSkinTypeRecommendations(skinType: string): string {
