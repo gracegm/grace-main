@@ -1,6 +1,7 @@
 // Database utilities for PeachieGlow AI System
-// Using in-memory storage for demo purposes - can be replaced with real database
+// Production MongoDB integration with fallback to in-memory for demo
 
+import { MongoClient, Db, Collection } from 'mongodb';
 import { 
   User, 
   SkinAnalysis, 
@@ -13,16 +14,169 @@ import {
   UserStats 
 } from '@/types/user';
 
-// In-memory storage (replace with real database in production)
+// Production MongoDB Database
+class MongoDatabase {
+  private client: MongoClient | null = null;
+  private db: Db | null = null;
+  private isConnected = false;
+  
+  // Collections
+  private users: Collection<User> | null = null;
+  private skinAnalyses: Collection<SkinAnalysis> | null = null;
+  private habitEntries: Collection<HabitEntry> | null = null;
+  private achievements: Collection<Achievement> | null = null;
+  private userAchievements: Collection<UserAchievement> | null = null;
+  private conversations: Collection<GlowBotConversation> | null = null;
+  private activities: Collection<UserActivity> | null = null;
+  private forecasts: Collection<SkinForecast> | null = null;
+
+  async connect(): Promise<void> {
+    try {
+      const mongoUri = process.env.MONGODB_URI;
+      if (!mongoUri) {
+        console.warn('MONGODB_URI not found, falling back to in-memory storage');
+        return;
+      }
+
+      this.client = new MongoClient(mongoUri);
+      await this.client.connect();
+      this.db = this.client.db('peachieglow');
+      
+      // Initialize collections
+      this.users = this.db.collection<User>('users');
+      this.skinAnalyses = this.db.collection<SkinAnalysis>('skin_analyses');
+      this.habitEntries = this.db.collection<HabitEntry>('habit_entries');
+      this.achievements = this.db.collection<Achievement>('achievements');
+      this.userAchievements = this.db.collection<UserAchievement>('user_achievements');
+      this.conversations = this.db.collection<GlowBotConversation>('conversations');
+      this.activities = this.db.collection<UserActivity>('activities');
+      this.forecasts = this.db.collection<SkinForecast>('forecasts');
+      
+      // Create indexes for better performance
+      await this.createIndexes();
+      
+      this.isConnected = true;
+      console.log('✅ Connected to MongoDB successfully');
+      
+    } catch (error) {
+      console.error('❌ MongoDB connection failed:', error);
+      console.log('📝 Falling back to in-memory storage for demo');
+    }
+  }
+  
+  private async createIndexes(): Promise<void> {
+    if (!this.users || !this.skinAnalyses || !this.habitEntries) return;
+    
+    try {
+      // User indexes
+      await this.users.createIndex({ email: 1 }, { unique: true });
+      await this.users.createIndex({ lastActive: -1 });
+      
+      // Skin analysis indexes
+      await this.skinAnalyses.createIndex({ userId: 1, date: -1 });
+      
+      // Habit entries indexes
+      await this.habitEntries.createIndex({ userId: 1, date: -1 });
+      
+      console.log('✅ Database indexes created successfully');
+    } catch (error) {
+      console.error('⚠️ Index creation failed:', error);
+    }
+  }
+
+  async disconnect(): Promise<void> {
+    if (this.client) {
+      await this.client.close();
+      this.isConnected = false;
+      console.log('📤 Disconnected from MongoDB');
+    }
+  }
+
+  // User operations
+  async getUser(userId: string): Promise<User | null> {
+    if (this.isConnected && this.users) {
+      return await this.users.findOne({ id: userId }) || null;
+    }
+    return this.fallbackDatabase.getUser(userId);
+  }
+
+  async createUser(user: User): Promise<void> {
+    if (this.isConnected && this.users) {
+      await this.users.insertOne(user);
+      return;
+    }
+    // Fallback: Add user to in-memory storage
+    this.fallbackDatabase.users.set(user.id, user);
+  }
+
+  async updateUser(userId: string, updates: Partial<User>): Promise<void> {
+    if (this.isConnected && this.users) {
+      await this.users.updateOne({ id: userId }, { $set: updates });
+      return;
+    }
+    this.fallbackDatabase.updateUser(userId, updates);
+  }
+
+  // Skin analysis operations
+  async getSkinAnalyses(userId: string): Promise<SkinAnalysis[]> {
+    if (this.isConnected && this.skinAnalyses) {
+      return await this.skinAnalyses.find({ userId }).sort({ date: -1 }).toArray();
+    }
+    return this.fallbackDatabase.getSkinAnalyses(userId);
+  }
+
+  async createSkinAnalysis(analysis: SkinAnalysis): Promise<void> {
+    if (this.isConnected && this.skinAnalyses) {
+      await this.skinAnalyses.insertOne(analysis);
+      return;
+    }
+    // Fallback: Add analysis to in-memory storage
+    const existing = this.fallbackDatabase.skinAnalyses.get(analysis.userId) || [];
+    existing.push(analysis);
+    this.fallbackDatabase.skinAnalyses.set(analysis.userId, existing);
+  }
+
+  // Habit entry operations
+  async getHabitEntries(userId: string): Promise<HabitEntry[]> {
+    if (this.isConnected && this.habitEntries) {
+      return await this.habitEntries.find({ userId }).sort({ date: -1 }).toArray();
+    }
+    return this.fallbackDatabase.getHabitEntries(userId);
+  }
+
+  async createHabitEntry(entry: HabitEntry): Promise<void> {
+    if (this.isConnected && this.habitEntries) {
+      await this.habitEntries.insertOne(entry);
+      return;
+    }
+    // Fallback: Add habit entry to in-memory storage
+    const existing = this.fallbackDatabase.habitEntries.get(entry.userId) || [];
+    existing.push(entry);
+    this.fallbackDatabase.habitEntries.set(entry.userId, existing);
+  }
+
+  async updateHabitEntry(entryId: string, updates: Partial<HabitEntry>): Promise<void> {
+    if (this.isConnected && this.habitEntries) {
+      await this.habitEntries.updateOne({ id: entryId }, { $set: updates });
+      return;
+    }
+    this.fallbackDatabase.updateHabitEntry(entryId, updates);
+  }
+
+  // Fallback in-memory database for demo/development
+  private fallbackDatabase = new InMemoryDatabase();
+}
+
+// In-memory storage fallback for development/demo
 class InMemoryDatabase {
-  private users: Map<string, User> = new Map();
-  private skinAnalyses: Map<string, SkinAnalysis[]> = new Map();
-  private habitEntries: Map<string, HabitEntry[]> = new Map();
-  private achievements: Map<string, Achievement> = new Map();
-  private userAchievements: Map<string, UserAchievement[]> = new Map();
-  private conversations: Map<string, GlowBotConversation[]> = new Map();
-  private activities: Map<string, UserActivity[]> = new Map();
-  private forecasts: Map<string, SkinForecast[]> = new Map();
+  public users: Map<string, User> = new Map();
+  public skinAnalyses: Map<string, SkinAnalysis[]> = new Map();
+  public habitEntries: Map<string, HabitEntry[]> = new Map();
+  public achievements: Map<string, Achievement> = new Map();
+  public userAchievements: Map<string, UserAchievement[]> = new Map();
+  public conversations: Map<string, GlowBotConversation[]> = new Map();
+  public activities: Map<string, UserActivity[]> = new Map();
+  public forecasts: Map<string, SkinForecast[]> = new Map();
 
   constructor() {
     this.initializeSampleData();
@@ -303,8 +457,96 @@ class InMemoryDatabase {
   }
 }
 
-// Export singleton instance
-export const db = new InMemoryDatabase();
+// Export singleton instance with MongoDB support
+const mongoDb = new MongoDatabase();
+const fallbackDb = new InMemoryDatabase();
+
+// Initialize MongoDB connection on startup
+if (typeof window === 'undefined') {
+  // Server-side only
+  mongoDb.connect().catch(console.error);
+}
+
+// Database service with MongoDB and fallback
+class DatabaseService {
+  async getUser(userId: string): Promise<User | null> {
+    return await mongoDb.getUser(userId);
+  }
+
+  async createUser(user: User): Promise<void> {
+    return await mongoDb.createUser(user);
+  }
+
+  async updateUser(userId: string, updates: Partial<User>): Promise<void> {
+    return await mongoDb.updateUser(userId, updates);
+  }
+
+  async getSkinAnalyses(userId: string): Promise<SkinAnalysis[]> {
+    return await mongoDb.getSkinAnalyses(userId);
+  }
+
+  async createSkinAnalysis(analysis: SkinAnalysis): Promise<void> {
+    return await mongoDb.createSkinAnalysis(analysis);
+  }
+
+  async getHabitEntries(userId: string): Promise<HabitEntry[]> {
+    return await mongoDb.getHabitEntries(userId);
+  }
+
+  async createHabitEntry(entry: HabitEntry): Promise<void> {
+    return await mongoDb.createHabitEntry(entry);
+  }
+
+  async updateHabitEntry(entryId: string, updates: Partial<HabitEntry>): Promise<void> {
+    return await mongoDb.updateHabitEntry(entryId, updates);
+  }
+
+  // Delegate other methods to fallback for now (can be extended)
+  async getAchievements(): Promise<Achievement[]> {
+    return await fallbackDb.getAchievements();
+  }
+
+  async getUserAchievements(userId: string): Promise<UserAchievement[]> {
+    return await fallbackDb.getUserAchievements(userId);
+  }
+
+  async addUserAchievement(achievement: UserAchievement): Promise<void> {
+    // Add to fallback storage
+    const existing = fallbackDb.userAchievements.get(achievement.userId) || [];
+    existing.push(achievement);
+    fallbackDb.userAchievements.set(achievement.userId, existing);
+  }
+
+  async getConversations(userId: string): Promise<GlowBotConversation[]> {
+    return await fallbackDb.getConversations(userId);
+  }
+
+  async addConversation(conversation: GlowBotConversation): Promise<void> {
+    return await fallbackDb.addConversation(conversation);
+  }
+
+  async getActivities(userId: string): Promise<UserActivity[]> {
+    return fallbackDb.activities.get(userId) || [];
+  }
+
+  async addActivity(activity: UserActivity): Promise<void> {
+    return await fallbackDb.addActivity(activity);
+  }
+
+  async getSkinForecasts(userId: string): Promise<SkinForecast[]> {
+    return await fallbackDb.getSkinForecasts(userId);
+  }
+
+  async addSkinForecast(forecast: SkinForecast): Promise<void> {
+    return await fallbackDb.addSkinForecast(forecast);
+  }
+
+  async getUserStats(userId: string): Promise<UserStats | null> {
+    return await fallbackDb.getUserStats(userId);
+  }
+}
+
+export const db = new DatabaseService();
 
 // Helper functions
 export async function calculateGlowScore(userId: string): Promise<number> {
