@@ -544,7 +544,8 @@ class DatabaseService {
       userId,
       achievementId,
       unlockedAt: new Date(),
-      progress: achievement.maxProgress || 1
+      progress: achievement.maxProgress || 1,
+      isUnlocked: true
     };
 
     // Add to database
