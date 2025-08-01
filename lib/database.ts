@@ -501,6 +501,42 @@ class DatabaseService {
     return await mongoDb.updateHabitEntry(entryId, updates);
   }
 
+  async getUserStats(userId: string): Promise<UserStats | null> {
+    return await fallbackDb.getUserStats(userId);
+  }
+
+  async unlockAchievement(userId: string, achievementId: string): Promise<UserAchievement | null> {
+    // Check if achievement exists
+    const achievements = await this.getAchievements();
+    const achievement = achievements.find(a => a.id === achievementId);
+    
+    if (!achievement) {
+      return null;
+    }
+
+    // Check if user already has this achievement
+    const userAchievements = await this.getUserAchievements(userId);
+    const existingAchievement = userAchievements.find(ua => ua.achievementId === achievementId);
+    
+    if (existingAchievement) {
+      return existingAchievement;
+    }
+
+    // Create new user achievement
+    const newUserAchievement: UserAchievement = {
+      id: `ua-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      userId,
+      achievementId,
+      unlockedAt: new Date(),
+      progress: achievement.maxProgress || 1
+    };
+
+    // Add to database
+    await this.addUserAchievement(newUserAchievement);
+    
+    return newUserAchievement;
+  }
+
   // Delegate other methods to fallback for now (can be extended)
   async getAchievements(): Promise<Achievement[]> {
     return await fallbackDb.getAchievements();
@@ -539,10 +575,6 @@ class DatabaseService {
 
   async addSkinForecast(forecast: SkinForecast): Promise<void> {
     return await fallbackDb.addSkinForecast(forecast);
-  }
-
-  async getUserStats(userId: string): Promise<UserStats | null> {
-    return await fallbackDb.getUserStats(userId);
   }
 }
 
