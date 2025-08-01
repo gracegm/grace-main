@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useSession, signIn, signOut } from 'next-auth/react';
+import ButtonSignin from './ButtonSignin';
 import GlowBot from './GlowBot';
 
 interface PeachieGlowHeaderProps {
@@ -10,7 +10,6 @@ interface PeachieGlowHeaderProps {
 }
 
 const PeachieGlowHeader = ({ className = "" }: PeachieGlowHeaderProps) => {
-  const { data: session, status } = useSession();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -38,6 +37,9 @@ const PeachieGlowHeader = ({ className = "" }: PeachieGlowHeaderProps) => {
     }
   };
 
+  // CTA button following FeNAgO template pattern
+  const cta = <ButtonSignin text="Get Started" extraStyle="btn-primary" />;
+
   return (
     <motion.header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -51,26 +53,23 @@ const PeachieGlowHeader = ({ className = "" }: PeachieGlowHeaderProps) => {
     >
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          
           {/* Logo */}
           <motion.div
             className="flex items-center space-x-3"
-            whileHover={{ scale: 1.05 }}
-            transition={{ duration: 0.2 }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
           >
             <GlowBot size="small" animated={true} />
-            <div>
-              <h1 className={`text-2xl font-bold ${isScrolled ? 'text-gray-800' : 'text-white'}`}>
-                Pe
-                <span className="text-[#00D4AA] drop-shadow-lg glow-text">A</span>
-                ch
-                <span className="text-[#00D4AA] drop-shadow-lg glow-text">I</span>
-                eGlow
-              </h1>
-              <p className={`text-sm font-medium ${isScrolled ? 'text-gray-600' : 'text-white/90'}`}>
-                Your Dewy Skin Assistant
-              </p>
-            </div>
+            <span className={`text-2xl font-bold transition-colors duration-200 ${
+              isScrolled ? 'text-gray-800' : 'text-white'
+            }`}>
+              Pe
+              <span className="text-[#00D4AA] drop-shadow-lg glow-text">A</span>
+              ch
+              <span className="text-[#00D4AA] drop-shadow-lg glow-text">I</span>
+              eGlow
+            </span>
           </motion.div>
 
           {/* Desktop Navigation */}
@@ -79,12 +78,14 @@ const PeachieGlowHeader = ({ className = "" }: PeachieGlowHeaderProps) => {
               <motion.button
                 key={item.label}
                 onClick={item.action}
-                className={`font-medium transition-colors duration-200 hover:text-[#00D4AA] cursor-pointer ${
-                  isScrolled ? 'text-gray-700' : 'text-white/90'
+                className={`font-medium transition-colors duration-200 hover:scale-105 ${
+                  isScrolled 
+                    ? 'text-gray-700 hover:text-[#00D4AA]' 
+                    : 'text-white/90 hover:text-white'
                 }`}
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 + 0.5 }}
+                transition={{ delay: 0.3 + index * 0.1 }}
                 whileHover={{ scale: 1.05 }}
               >
                 {item.label}
@@ -92,77 +93,29 @@ const PeachieGlowHeader = ({ className = "" }: PeachieGlowHeaderProps) => {
             ))}
           </nav>
 
-          {/* CTA Buttons */}
-          <div className="hidden md:flex items-center space-x-4">
-            {session ? (
-              <div className="flex items-center space-x-4">
-                <span className={`text-sm ${
-                  isScrolled ? 'text-gray-600' : 'text-white/80'
-                }`}>
-                  Hi, {session.user?.name?.split(' ')[0] || 'User'}!
-                </span>
-                <motion.button
-                  onClick={() => signOut()}
-                  className={`font-medium transition-colors duration-200 ${
-                    isScrolled 
-                      ? 'text-gray-700 hover:text-[#00D4AA]' 
-                      : 'text-white/90 hover:text-white'
-                  }`}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.8 }}
-                  whileHover={{ scale: 1.05 }}
-                >
-                  Sign Out
-                </motion.button>
-              </div>
-            ) : (
-              <motion.button
-                onClick={() => signIn()}
-                className={`font-medium transition-colors duration-200 ${
-                  isScrolled 
-                    ? 'text-gray-700 hover:text-[#00D4AA]' 
-                    : 'text-white/90 hover:text-white'
-                }`}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.8 }}
-                whileHover={{ scale: 1.05 }}
-              >
-                Sign In
-              </motion.button>
-            )}
-            
-            <motion.button
-              onClick={() => {
-                if (session) {
-                  // User is signed in, redirect to dashboard
-                  window.location.href = '/dashboard';
-                } else {
-                  // User not signed in, sign in first
-                  signIn();
-                }
-              }}
-              className="bg-gradient-to-r from-[#00D4AA] to-[#4CAF50] text-white font-semibold px-6 py-2 rounded-full hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+          {/* CTA Button - Following FeNAgO Template Pattern */}
+          <div className="hidden md:flex items-center">
+            <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.9 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              transition={{ delay: 0.8 }}
             >
-              {session ? 'Go to Dashboard' : 'Start Free Trial'}
-            </motion.button>
+              {cta}
+            </motion.div>
           </div>
 
           {/* Mobile Menu Button */}
           <motion.button
-            className={`md:hidden p-2 rounded-lg transition-colors duration-200 ${
-              isScrolled ? 'text-gray-700' : 'text-white'
-            }`}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
+            className={`md:hidden p-2 rounded-lg transition-colors duration-200 ${
+              isScrolled 
+                ? 'text-gray-700 hover:bg-gray-100' 
+                : 'text-white/90 hover:bg-white/10'
+            }`}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.9 }}
+            whileTap={{ scale: 0.95 }}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               {isMobileMenuOpen ? (
@@ -178,19 +131,15 @@ const PeachieGlowHeader = ({ className = "" }: PeachieGlowHeaderProps) => {
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div
-              className="md:hidden mt-4 pb-4"
+              className="md:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100"
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <div className={`rounded-2xl p-4 ${
-                isScrolled 
-                  ? 'bg-gray-50 border border-gray-200' 
-                  : 'bg-white/10 backdrop-blur-md border border-white/20'
-              }`}>
-                {/* Mobile Navigation Links */}
-                <nav className="space-y-3 mb-4">
+              <div className="container mx-auto px-6 py-6">
+                {/* Mobile Navigation */}
+                <nav className="space-y-4 mb-6">
                   {navItems.map((item, index) => (
                     <motion.button
                       key={item.label}
@@ -198,42 +147,25 @@ const PeachieGlowHeader = ({ className = "" }: PeachieGlowHeaderProps) => {
                         item.action();
                         setIsMobileMenuOpen(false);
                       }}
-                      className={`block w-full text-left font-medium transition-colors duration-200 hover:text-[#00D4AA] ${
-                        isScrolled ? 'text-gray-700' : 'text-white/90'
-                      }`}
+                      className="block w-full text-left font-medium text-gray-700 hover:text-[#00D4AA] py-2 transition-colors duration-200"
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
+                      transition={{ delay: 0.1 * index }}
                     >
                       {item.label}
                     </motion.button>
                   ))}
                 </nav>
 
-                {/* Mobile CTA Buttons */}
+                {/* Mobile CTA Button */}
                 <div className="space-y-3">
-                  <motion.button
-                    className={`w-full text-center font-medium py-2 rounded-lg transition-colors duration-200 ${
-                      isScrolled 
-                        ? 'text-gray-700 hover:bg-gray-100' 
-                        : 'text-white/90 hover:bg-white/10'
-                    }`}
+                  <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 }}
                   >
-                    Sign In
-                  </motion.button>
-                  
-                  <motion.button
-                    className="w-full bg-gradient-to-r from-[#00D4AA] to-[#4CAF50] text-white font-semibold py-3 rounded-full hover:shadow-lg transition-all duration-300"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.6 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    Start Free Trial
-                  </motion.button>
+                    {cta}
+                  </motion.div>
                 </div>
               </div>
             </motion.div>
@@ -247,6 +179,11 @@ const PeachieGlowHeader = ({ className = "" }: PeachieGlowHeaderProps) => {
           text-shadow: 0 0 10px #00D4AA, 0 0 20px #00D4AA;
         }
       `}</style>
+
+      {/* GlowBot Integration */}
+      <div className="fixed bottom-6 right-6 z-40">
+        <GlowBot />
+      </div>
     </motion.header>
   );
 };
