@@ -489,6 +489,10 @@ class DatabaseService {
     return await mongoDb.createSkinAnalysis(analysis);
   }
 
+  async addSkinAnalysis(analysis: SkinAnalysis): Promise<void> {
+    return await this.createSkinAnalysis(analysis);
+  }
+
   async getLatestSkinAnalysis(userId: string): Promise<SkinAnalysis | null> {
     const analyses = await this.getSkinAnalyses(userId);
     if (analyses.length === 0) return null;
@@ -503,6 +507,10 @@ class DatabaseService {
 
   async createHabitEntry(entry: HabitEntry): Promise<void> {
     return await mongoDb.createHabitEntry(entry);
+  }
+
+  async addHabitEntry(entry: HabitEntry): Promise<void> {
+    return await this.createHabitEntry(entry);
   }
 
   async updateHabitEntry(entryId: string, updates: Partial<HabitEntry>): Promise<void> {
